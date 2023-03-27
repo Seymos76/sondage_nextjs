@@ -11,7 +11,7 @@ export default function Home() {
   const [sondage, setSondage] = useState(newSondage);
   const [disabled, setDisabled] = useState(true);
 
-  const sendMail = async (data) => {
+  const sendMail = async (data: any) => {
     try {
       return await fetch("https://sondage-api.herokuapp.com/", {
         "method": "POST",
@@ -22,7 +22,7 @@ export default function Home() {
       // toast error message. whatever you wish
     }
   }
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     const { error } = await supabaseClient
         .from('sondage')
