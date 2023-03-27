@@ -30,14 +30,14 @@ export default function Home() {
     //const response = await sendMail(sondage);
     console.log('error',error);
   }
-  const handleChange = ({target}) => {
+  const handleChange = ({ target }: any) => {
     const { name, value } = target;
     let currentSondage: any = {...sondage}
     currentSondage[name] = value;
     setSondage(currentSondage);
     console.log('current sondage ',currentSondage);
   }
-  const handleMultipleChoiceField = ({ target }) => {
+  const handleMultipleChoiceField = ({ target }: any) => {
     const { name, value } = target;
     let currentSondage: any = {...sondage};
     if (currentSondage[name] === undefined) {
