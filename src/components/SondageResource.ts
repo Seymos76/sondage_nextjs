@@ -26,7 +26,7 @@ class SondageResource {
     }
 
     build(props: Sondage, entries: Array<string>) {
-        entries.forEach((value: string, index: number) => {
+        /*entries.forEach((value: string, index: number) => {
             if ("subtiles_perceptions" === value) {
                 return;
             }
@@ -34,7 +34,7 @@ class SondageResource {
                 return;
             }
             this[value] = props[value];
-        });
+        });*/
         /*props.subtiles_perceptions.forEach((value: string, index: number) => {
             this.subtiles_perceptions += value + ', ';
         });
