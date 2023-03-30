@@ -2,18 +2,38 @@ import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { Inter } from 'next/font/google'
 import Sondage from "@/components/Sondage"
+import SondageResource from "@/components/SondageResource";
+import axios from "axios";
+import useSWR, { SWRConfig } from 'swr';
 import {supabaseClient} from "@/supabase/client"
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
+
+const fetcher = url => axios.get(url).then(res => res.data);
 
 export default function Home() {
   let newSondage: Sondage = new Sondage();
   const [sondage, setSondage] = useState(newSondage);
   const [disabled, setDisabled] = useState(true);
-
+  const [serverIsAwake, setServerIsAwake] = useState(false);
+  const { data, error } = useSWR("https://sondage-api.herokuapp.com", fetcher);
+  useEffect(() => {
+    console.log('serverResponse',data, error);
+  }, []);
+  const isServerAwake = async () => {
+    try {
+      return await fetch("https://sondage-api.herokuapp.com", {
+        "method": "GET",
+        "headers": { "content-type": "application/json" },
+      });
+    } catch (error) {
+      console.log('error',error);
+      // toast error message. whatever you wish
+    }
+  }
   const sendMail = async (data: any) => {
     try {
-      return await fetch("https://sondage-api.herokuapp.com/", {
+      return await fetch("/api/send-email", {
         "method": "POST",
         "headers": { "content-type": "application/json" },
         "body": JSON.stringify(data)
@@ -24,18 +44,23 @@ export default function Home() {
   }
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    const { error } = await supabaseClient
+    const entries = Object.keys({...sondage});
+    console.log('entries',entries);
+    let sondageResource: SondageResource = new SondageResource();
+    console.log('sondageResource',sondageResource);
+    sondageResource.build(sondage, entries);
+    console.log('sondageResource',sondageResource);
+    /*const { error } = await supabaseClient
         .from('sondage')
         .insert(sondage)
-    //const response = await sendMail(sondage);
-    console.log('error',error);
+    console.log('error',error);*/
   }
   const handleChange = ({ target }: any) => {
     const { name, value } = target;
     let currentSondage: any = {...sondage}
     currentSondage[name] = value;
-    setSondage(currentSondage);
     console.log('current sondage ',currentSondage);
+    setSondage(currentSondage);
   }
   const handleMultipleChoiceField = ({ target }: any) => {
     const { name, value } = target;
@@ -49,6 +74,7 @@ export default function Home() {
     } else {
       currentSondage[name].push(value);
     }
+    console.log('current sondage ',currentSondage);
     setSondage(currentSondage);
   }
   const showTimeForImmersionField = () => {

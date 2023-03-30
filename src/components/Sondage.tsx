@@ -9,7 +9,7 @@ class Sondage {
   why_are_you_interested_by_initiation?: string;
   subjects: Array<string> = [];
   other_subjects?: string = '';
-  content_type_preference: Array<string> = [];
+  content_type_preference: string = '';
   need_following: string = '';
   interested_by_immersion: string = '';
   group_size: string = '';
