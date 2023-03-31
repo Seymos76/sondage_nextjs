@@ -14,9 +14,9 @@ export default function Home() {
     useEffect(() => {
         setServerMessage("Chargement du serveur...");
         const isAwake = fetch(API_URL+'api/is-awake', {
-            method: 'GET',
-            mode: "cors",
-            headers: {
+            "method": 'GET',
+            "mode": "cors",
+            "headers": {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": API_URL
             }
@@ -49,10 +49,10 @@ export default function Home() {
         event.preventDefault();
         console.log(JSON.stringify(sondage));
         const submitResponse = fetch(API_URL+'api/surveys', {
-            method: 'POST',
-            body: JSON.stringify(sondage),
-            mode: "cors",
-            headers: {
+            "method": 'POST',
+            "body": JSON.stringify(sondage),
+            "mode": "cors",
+            "headers": {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             }
