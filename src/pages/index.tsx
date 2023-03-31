@@ -1,10 +1,10 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
-import { Inter } from 'next/font/google'
+//import { Inter } from 'next/font/google'
 import Sondage from "@/components/Sondage"
 
-const inter = Inter({ subsets: ['latin'] });
-const API_URL = process.env.API_URL;
+//const inter = Inter({ subsets: ['latin'] });
+const API_URL = process.env.API_URL ?? 'https://localhost:8000/';
 
 export default function Home() {
     let newSondage: Sondage = new Sondage();
@@ -13,15 +13,29 @@ export default function Home() {
     const [serverMessage, setServerMessage] = useState('');
     useEffect(() => {
         setServerMessage("Chargement du serveur...");
-        fetch(API_URL+'api/is-awake')
-            .then((response) => response.status)
-            .then((status) => {
-                console.log('status',status);
-                    if (200 === status) {
-                        setLoading(false);
-                    }
+        const isAwake = fetch(API_URL+'api/is-awake', {
+            method: 'GET',
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": API_URL
+            }
+        })
+            .then((response) => {
+                console.log('is awake response',response);
+                if (!response.ok) {
+                    setServerMessage("Le serveur ne répond pas...");
                 }
-            )
+                return response;
+            })
+            .then((response) => {
+                console.log('status',response.status);
+                if (200 !== response.status) {
+                    setServerMessage("Le serveur ne répond pas...");
+                    setLoading(false);
+                }
+                return response;
+            })
             .catch((error) => {
                 if (undefined !== error) {
                     setServerMessage("Le serveur est indisponible actuellement, merci de réessayer plus tard.");
@@ -29,32 +43,24 @@ export default function Home() {
                 console.log('error',error);
             })
         ;
+        console.log('isAwake',isAwake);
     }, []);
-    const sendMail = async (data: any) => {
-        try {
-            return await fetch("https://localhost:8000/api/send-email", {
-                "method": "POST",
-                "headers": { "content-type": "application/json" },
-                "body": JSON.stringify(data)
-            });
-        } catch (error) {
-            // toast error message. whatever you wish
-        }
-    }
     const handleSubmit = async (event: any) => {
         event.preventDefault();
-        fetch(API_URL+'api/surveys', {
+        console.log(JSON.stringify(sondage));
+        const submitResponse = fetch(API_URL+'api/surveys', {
             method: 'POST',
             body: JSON.stringify(sondage),
             mode: "cors",
             headers: {
-                'Content-Type': 'json',
+                'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             }
         })
             .then((response) => response)
             .then((data) => {
                     console.log('data',data);
+                    return data;
                 }
             )
             .catch((error) => {
@@ -63,12 +69,7 @@ export default function Home() {
                 }
                 console.log('error',error);
             });
-        /*const entries = Object.keys({...sondage});
-        console.log('entries',entries);
-        let sondageResource: SondageResource = new SondageResource();
-        console.log('sondageResource',sondageResource);
-        sondageResource.build(sondage, entries);
-        console.log('sondageResource',sondageResource);*/
+        console.log('submitResponse',submitResponse);
     }
     const handleChange = ({ target }: any) => {
         const { name, value } = target;
@@ -114,7 +115,7 @@ export default function Home() {
     const wantsOtherSubjects = () => {
         return sondage?.subjects?.includes('other');
     }
-    //console.log('sondage',sondage);
+    console.log('API URL',API_URL);
     return (
         <>
             <div>
@@ -268,6 +269,7 @@ export default function Home() {
                                 </>
                                 : <></>}
                             {!loading ? <button type="submit" className='btn btn-primary'>Soumettre mes réponses</button> : <p>{serverMessage}</p>}
+                            <button type="submit" className='btn btn-primary'>Soumettre mes réponses</button>
                         </form>
                     </div>
                 </main>

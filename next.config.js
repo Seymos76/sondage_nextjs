@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    API_URL: 'https://sondage-api.herokuapp.com/'
+    API_URL: process.env.API_URL ?? process.env.API_URL_PROD ?? 'https://localhost:8000/'
   }
 }
 

@@ -1,5 +1,6 @@
 export default
 class Sondage {
+  title: string = "Sondage pour guide multidimensionnel du 3e oeil";
   familiar_with_energy: string = '';
   what_did_bring_you_to_energetic: string = '';
   is_practician: string = '';
