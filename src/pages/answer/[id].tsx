@@ -7,7 +7,7 @@ export default function SurveyResult({ result }) {
         if (!result) {
             return;
         }
-        return result.map((res, index) => {
+        return result?.map((res, index) => {
             console.log('res:',res,index);
         });
     }
@@ -34,10 +34,18 @@ export default function SurveyResult({ result }) {
     )
 }
 
-export async function getServerSideProps(id) {
+export async function getServerSideProps(id: number) {
     // Fetch data from external API
-    const res = await fetch(`https://localhost:8000/api/surveys/results/${id}`)
-    const data = await res.json()
+    const res = await fetch(`https://localhost:8000/api/surveys/results/${id}`, {
+        method: 'GET',
+        mode: "cors",
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Request-Headers': 'Content-Type'
+        }
+    })
+    const data = await res?.json()
 
     // Pass data to the page via props
     return { props: { data } }

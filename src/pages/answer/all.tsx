@@ -68,16 +68,15 @@ export default function AllAnswers({ data }) {
 
 export async function getServerSideProps() {
     // Fetch data from external API
-    const res = await fetch(`${API_URL}api/surveys/results`, {
+    const res: any = await fetch(`${API_URL}api/surveys/results`, {
         method: 'GET',
         mode: "cors",
         headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Request-Headers': 'Content-Type, Authorization, Access-Control-Allow-Origin'
         }
     })
-    const data = await res.json()
+    const data: any = await res.json()
 
     // Pass data to the page via props
     return { props: { data } }
