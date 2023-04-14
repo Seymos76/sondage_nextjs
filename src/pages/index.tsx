@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Sondage from "@/components/Sondage"
 
 //const inter = Inter({ subsets: ['latin'] });
-const API_URL = process.env.API_URL ?? 'https://localhost:8000/';
+const API_URL = process.env.API_URL ?? 'https://localhost:8000';
 
 export default function Home() {
     let newSondage: Sondage = new Sondage();
@@ -13,48 +13,48 @@ export default function Home() {
     const [serverMessage, setServerMessage] = useState('');
     useEffect(() => {
         setServerMessage("Chargement du serveur...");
+
         const isAwake = fetch(API_URL+'api/is-awake', {
-            "method": 'GET',
-            "mode": "cors",
-            "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": API_URL
-            }
-        })
-            .then((response) => {
-                console.log('is awake response',response);
-                if (!response.ok) {
-                    setServerMessage("Le serveur ne répond pas...");
+                "method": 'GET',
+                "mode": "cors",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": API_URL
                 }
-                return response;
             })
-            .then((response) => {
-                console.log('status',response.status);
-                if (200 !== response.status) {
-                    setServerMessage("Le serveur ne répond pas...");
-                    setLoading(false);
-                }
-                return response;
-            })
-            .catch((error) => {
-                if (undefined !== error) {
-                    setServerMessage("Le serveur est indisponible actuellement, merci de réessayer plus tard.");
-                }
-                console.log('error',error);
-            })
+                .then((response) => {
+                    console.log('is awake response',response);
+                    if (!response.ok) {
+                        setServerMessage("Le serveur ne répond pas...");
+                    }
+                    if (200 !== response.status) {
+                        setServerMessage("Le serveur ne répond pas...");
+                        setLoading(false);
+                    }
+                    setServerMessage("");
+                    return response;
+                })
+                .catch((error) => {
+                    if (undefined !== error) {
+                        setServerMessage("Le serveur est indisponible actuellement, merci de réessayer plus tard.");
+                    }
+                    console.log('error',error);
+                    return error;
+                })
         ;
         console.log('isAwake',isAwake);
     }, []);
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         console.log(JSON.stringify(sondage));
-        const submitResponse = fetch(API_URL+'api/surveys', {
+        const submitResponse = fetch(API_URL+'/api/surveys', {
             "method": 'POST',
             "body": JSON.stringify(sondage),
-            "mode": "cors",
+            "mode": "no-cors",
             "headers": {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                "Access-Control-Request-Method": "POST",
             }
         })
             .then((response) => response)
@@ -68,6 +68,7 @@ export default function Home() {
                     setServerMessage("Le formulaire n'a pas pu être envoyé.");
                 }
                 console.log('error',error);
+                return error;
             });
         console.log('submitResponse',submitResponse);
     }
@@ -93,28 +94,6 @@ export default function Home() {
         console.log('current sondage ',currentSondage);
         setSondage(currentSondage);
     }
-    const showTimeForImmersionField = () => {
-        return 'false' === sondage.interested_by_immersion;
-    }
-    const showTimeForImmersionOtherField = () => {
-        return 'other' === sondage.time_for_immersion;
-    }
-    const isInterestedByInitiation = () => {
-        return 'true' === sondage.is_interested_by_initiation;
-
-    }
-    const isInterestedByImmersion = () => {
-        return 'true' === sondage.interested_by_immersion;
-    }
-    const isFamiliar = () => {
-        return 'true' === sondage.familiar_with_energy;
-    }
-    const isPractician = () => {
-        return 'true' === sondage.is_practician;
-    }
-    const wantsOtherSubjects = () => {
-        return sondage?.subjects?.includes('other');
-    }
     console.log('API URL',API_URL);
     return (
         <>
@@ -138,7 +117,7 @@ export default function Home() {
                                 <br/>
                                 <input type="radio" name="familiar_with_energy" value={'false'} id="" onChange={handleChange} /> Non
                             </fieldset>
-                            {isFamiliar() && <>
+                            {sondage.isFamiliar() && <>
                                 <fieldset className='mb-3 form-group'>
                                     <label htmlFor="">Qu'est-ce qui vous a amené(e) à vous intéresser à l'énergétique ?</label>
                                     <textarea name="what_did_bring_you_to_energetic" id="" cols={30} rows={10} className={'form-control'} onChange={handleChange}></textarea>
@@ -150,7 +129,7 @@ export default function Home() {
                                     <br/>
                                     <input type="radio" name="is_practician" value={'false'} id="" onChange={handleChange} /> Non
                                 </fieldset>
-                                {isPractician() && <>
+                                {sondage.isPractician() && <>
                                     <fieldset className='mb-3 form-group'>
                                         <label htmlFor="">Dans quel(s) domaine(s) ?</label>
                                         <textarea name="in_which_domains_are_you" id="" cols={30} rows={10} className={'form-control'} onChange={handleChange}></textarea>
@@ -178,7 +157,7 @@ export default function Home() {
                                 <label htmlFor="">Pourquoi ?</label>
                                 <textarea name="why_are_you_interested_by_initiation" id="" cols={30} rows={10} className={'form-control'} onChange={handleChange}></textarea>
                             </fieldset>
-                            {isInterestedByInitiation()
+                            {sondage.isInterestedByInitiation()
                                 ? <>
                                     <fieldset className='mb-3 form-group'>
                                         <label htmlFor="">Quels sujets complémentaires seraient susceptibles de vous intéresser ?</label><br/>
@@ -186,7 +165,7 @@ export default function Home() {
                                         <input type="checkbox" name="subjects" id="" onChange={handleMultipleChoiceField} value={'multivers'} /> Multivers<br/>
                                         <input type="checkbox" name="subjects" id="" onChange={handleMultipleChoiceField} value={'chakras_et_corps_energetiques'} /> Charkras et corps énergétiques<br/>
                                         <input type="checkbox" name="subjects" id="" onChange={handleMultipleChoiceField} value={'other'} /> Autres<br/>
-                                        {wantsOtherSubjects()
+                                        {sondage.wantsOtherSubjects()
                                             ?
                                             <>
                                                 <textarea name="other_subjects" id="" cols={30} rows={10} className={'form-control'} onChange={handleChange} placeholder={"Merci de faire une liste des sujets que vous aimeriez aborder"}></textarea>
@@ -216,7 +195,7 @@ export default function Home() {
                                         <input type="radio" name="interested_by_immersion" value={'true'} id="" onChange={handleChange} /> Oui<br/>
                                         <input type="radio" name="interested_by_immersion" value={'false'} id="" onChange={handleChange} /> Non
                                     </fieldset>
-                                    {isInterestedByImmersion()
+                                    {sondage.isInterestedByImmersion()
                                         ? <>
                                             <fieldset className='mb-3 form-group'>
                                                 <label htmlFor="">Quelle dimension de groupe est la plus confortable pour vous ?</label>
@@ -230,7 +209,7 @@ export default function Home() {
                                                 <label htmlFor="">Pourquoi ?</label>
                                                 <textarea name="why_are_you_interested_by_immersion" id="" cols={30} rows={10} className={'form-control'} onChange={handleChange}></textarea>
                                             </fieldset>
-                                            {showTimeForImmersionField()
+                                            {sondage.showTimeForImmersionField()
                                                 ? <>
                                                     <fieldset className='mb-3 form-group'>
                                                         <label htmlFor="">Quelle serait pour vous la durée idéale de l'immersion ?</label>
@@ -240,7 +219,7 @@ export default function Home() {
                                                             <option value="1 week">1 semaine</option>
                                                             <option value="other">Autre</option>
                                                         </select>
-                                                        {showTimeForImmersionOtherField()
+                                                        {sondage.showTimeForImmersionOtherField()
                                                             ? <>
                                                                 <fieldset className='mb-3 form-group'>
                                                                     <label htmlFor="">Quelle durée en jours ?</label>

@@ -1,6 +1,6 @@
 import Head from 'next/head'
 
-const API_URL = process.env.API_URL ?? 'https://localhost:8000/';
+const API_URL = process.env.API_URL ?? 'https://localhost:8000';
 
 export default function SurveyResult({ result }) {
     const showResult = () => {

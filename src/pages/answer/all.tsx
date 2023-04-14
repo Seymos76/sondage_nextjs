@@ -1,14 +1,14 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 
-const API_URL = process.env.API_URL ?? 'https://localhost:8000/';
+const API_URL = process.env.API_URL ?? 'https://localhost:8000';
 
 export default function AllAnswers({ data }) {
     const [loading, setLoading] = useState(true);
     const [serverMessage, setServerMessage] = useState('');
     useEffect(() => {
         setServerMessage("Chargement du serveur...");
-        fetch(API_URL+'api/is-awake', {
+        fetch(`${API_URL}/api/is-awake`, {
             method: 'GET',
             mode: "cors",
             headers: {
@@ -17,8 +17,8 @@ export default function AllAnswers({ data }) {
                 'Access-Control-Request-Headers': 'Content-Type'
             }
         })
-            .then((response) => response.status)
-            .then((status) => {
+            .then((response) => response)
+            .then(({status}) => {
                     console.log('status',status);
                     if (200 === status) {
                         setLoading(false);

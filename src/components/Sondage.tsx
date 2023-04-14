@@ -20,4 +20,28 @@ class Sondage {
   have_you_some_questions: string = '';
   lead_email: string = '';
   agree_for_notification: boolean = false;
+
+  showTimeForImmersionField = () => {
+    return 'false' === this.interested_by_immersion;
+  }
+
+  showTimeForImmersionOtherField = () => {
+    return 'other' === this.time_for_immersion;
+  }
+
+  isInterestedByInitiation = () => {
+    return 'true' === this.is_interested_by_initiation;
+  }
+  isInterestedByImmersion = () => {
+    return 'true' === this.interested_by_immersion;
+  }
+  isFamiliar = () => {
+    return 'true' === this.familiar_with_energy;
+  }
+  isPractician = () => {
+    return 'true' === this.is_practician;
+  }
+  wantsOtherSubjects = () => {
+    return this.subjects?.includes('other');
+  }
 }
